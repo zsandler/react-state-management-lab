@@ -88,14 +88,6 @@ const App = () => {
       },
     ])
 
-  const handleAddFighter = (newFighter) => {
-    setTeam([...team, newFighter])
-    setMoney(money - newFighter.price)
-
-    const updatedZombieFighters = zombieFighters.filter(
-      (fighter) => fighter.id !== newFighter.id)
-    setZombieFighters(updatedZombieFighters)
-  }
 
   const totalStrength = (fighters) => {
     return fighters.reduce((total, fighter) => total + fighter.strength, 0)
@@ -105,9 +97,30 @@ const App = () => {
     return fighters.reduce((total, fighter) => total + fighter.agility, 0)
   }
 
+  const handleRemoveFighter = (badFighter) => {
+    setZombieFighters([...zombieFighters, badFighter])
+    const updatedTeam = team.filter(
+      (fighter) => fighter.id !== badFighter.id
+    )
+    setTeam(updatedTeam)
+    setMoney(money + badFighter.price)
+  }
+  const handleAddFighter = (newFighter) => {
+    if (money < newFighter.price) {
+      console.log('Not enough money!')
+      return
+    }
+
+
+    setTeam([...team, newFighter])
+    setMoney(money - newFighter.price)
+    const updatedZombieFighters = zombieFighters.filter(
+      (fighter) => fighter.id !== newFighter.id)
+    setZombieFighters(updatedZombieFighters)
+  }
+
   return (
     <>
-      {/* {money < zombieFighters.price ? console.log('Not enough money') : ''} */}
       <h2>Your Team</h2>
       {team.length === 0 ? <h4>Pick some team members!</h4> : ''}
       <h3>Total Team Strength: {totalStrength(team)}</h3>
@@ -122,6 +135,9 @@ const App = () => {
               <p>Strength: {fighter.strength}</p>
               <p>Agility: {fighter.agility}</p>
               <img src={fighter.img} alt={fighter.name} width="100" />
+              <button onClick={() => handleRemoveFighter(fighter)}>
+                Remove {fighter.name}
+              </button>
             </div>
           </li>
         ))}
